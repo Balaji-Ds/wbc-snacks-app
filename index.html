@@ -291,6 +291,95 @@
             gap: 10px;
             margin-top: 20px;
         }
+        
+        .menu-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+        
+        .history-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .history-item h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .history-item p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .history-item small {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .delete-history-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            float: right;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-history-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -307,6 +396,9 @@
         
         <!-- Main Page -->
         <div id="mainPage" class="page active">
+            <div class="nav-buttons">
+                <button class="menu-btn" onclick="showHistory()">📋 Previous Lists</button>
+            </div>
             <div id="snacksList"></div>
             <div class="button-container">
                 <button class="add-btn" onclick="addNewSnack()">+ Add New Snack</button>
@@ -316,9 +408,21 @@
         
         <!-- Summary Page -->
         <div id="summaryPage" class="page">
-            <button class="back-btn" onclick="goBack()">← Back</button>
-            <button class="edit-btn" onclick="editMode()">✏️ Edit</button>
+            <div class="nav-buttons">
+                <button class="back-btn" onclick="goBack()">← Back</button>
+                <button class="edit-btn" onclick="editMode()">✏️ Edit</button>
+                <button class="whatsapp-btn" onclick="shareToWhatsApp()">
+                    <span>📱</span> Share to WhatsApp
+                </button>
+            </div>
             <div id="summaryContent"></div>
+        </div>
+        
+        <!-- History Page -->
+        <div id="historyPage" class="page">
+            <button class="back-btn" onclick="goToMain()">← Back to Main</button>
+            <h2 style="margin-bottom: 20px; color: #2d3748;">Previous Lists</h2>
+            <div id="historyContent"></div>
         </div>
     </div>
 
@@ -335,13 +439,40 @@
         
         let snacksData = [];
         let isEditMode = false;
+        let savedLists = [];
         
         function initializeApp() {
             snacksData = defaultSnacks.map(snack => ({
                 ...snack,
                 quantity: 0
             }));
+            loadSavedLists();
             renderSnacks();
+        }
+        
+        function loadSavedLists() {
+            // In a real app, you would load from localStorage or a database
+            // For now, we'll use a simple array stored in memory
+            savedLists = [];
+        }
+        
+        function saveCurrentList() {
+            const filteredSnacks = snacksData.filter(snack => snack.quantity > 0);
+            if (filteredSnacks.length > 0) {
+                const listSummary = {
+                    id: Date.now(),
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                    items: filteredSnacks,
+                    totalItems: filteredSnacks.reduce((sum, snack) => sum + snack.quantity, 0)
+                };
+                savedLists.unshift(listSummary); // Add to beginning of array
+                
+                // Keep only last 10 lists
+                if (savedLists.length > 10) {
+                    savedLists = savedLists.slice(0, 10);
+                }
+            }
         }
         
         function updateSnackName(index, value) {
@@ -439,9 +570,98 @@
                         <p>${totalItems} snacks</p>
                     </div>
                 `;
+                
+                // Save this list to history
+                saveCurrentList();
             }
             
             showPage('summaryPage');
+        }
+        
+        function shareToWhatsApp() {
+            const filteredSnacks = snacksData.filter(snack => snack.quantity > 0);
+            if (filteredSnacks.length === 0) {
+                alert('No snacks selected to share!');
+                return;
+            }
+            
+            const totalItems = filteredSnacks.reduce((sum, snack) => sum + snack.quantity, 0);
+            
+            let message = "🍽️ *WBC Snacks List*\n\n";
+            message += "📋 *Items Ordered:*\n";
+            
+            filteredSnacks.forEach(snack => {
+                message += `• ${snack.name}: ${snack.quantity}\n`;
+            });
+            
+            message += `\n📊 *Total Items:* ${totalItems} snacks\n`;
+            message += `📅 *Date:* ${new Date().toLocaleDateString()}\n`;
+            message += `⏰ *Time:* ${new Date().toLocaleTimeString()}\n\n`;
+            message += "Generated by WBC Snacks App 📱";
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        function showHistory() {
+            const historyContent = document.getElementById('historyContent');
+            
+            if (savedLists.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No previous lists</h3>
+                        <p>Your completed snack lists will appear here</p>
+                    </div>
+                `;
+            } else {
+                historyContent.innerHTML = savedLists.map(list => `
+                    <div class="history-item" onclick="viewHistoryList(${list.id})">
+                        <button class="delete-history-btn" onclick="event.stopPropagation(); deleteHistoryList(${list.id})">×</button>
+                        <h4>${list.totalItems} items ordered</h4>
+                        <p>${list.items.map(item => `${item.name} (${item.quantity})`).join(', ')}</p>
+                        <small>${list.date} at ${list.time}</small>
+                    </div>
+                `).join('');
+            }
+            
+            showPage('historyPage');
+        }
+        
+        function viewHistoryList(listId) {
+            const list = savedLists.find(l => l.id === listId);
+            if (!list) return;
+            
+            // Load this list into current snacks data
+            snacksData = defaultSnacks.map(snack => ({
+                ...snack,
+                quantity: 0
+            }));
+            
+            // Set quantities from history
+            list.items.forEach(historyItem => {
+                const snackIndex = snacksData.findIndex(s => s.name === historyItem.name);
+                if (snackIndex !== -1) {
+                    snacksData[snackIndex].quantity = historyItem.quantity;
+                } else {
+                    // Add new snack if it doesn't exist in default list
+                    snacksData.push({
+                        name: historyItem.name,
+                        quantity: historyItem.quantity
+                    });
+                }
+            });
+            
+            renderSnacks();
+            showPage('mainPage');
+        }
+        
+        function deleteHistoryList(listId) {
+            savedLists = savedLists.filter(list => list.id !== listId);
+            showHistory(); // Refresh the history page
+        }
+        
+        function goToMain() {
+            showPage('mainPage');
         }
         
         function editMode() {
