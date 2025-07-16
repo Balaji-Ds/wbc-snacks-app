@@ -379,6 +379,119 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .share-modal.active {
+            display: flex;
+        }
+        
+        .share-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow: auto;
+            text-align: center;
+        }
+        
+        .share-text {
+            width: 100%;
+            height: 200px;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            resize: none;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 15px 0;
+            background: #f8fafc;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .modal-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .copy-btn {
+            background: #25d366;
+            color: white;
+        }
+        
+        .copy-btn:hover {
+            background: #128c7e;
+        }
+        
+        .whatsapp-web-btn {
+            background: #25d366;
+            color: white;
+        }
+        
+        .whatsapp-web-btn:hover {
+            background: #128c7e;
+        }
+        
+        .close-btn {
+            background: #666;
+            color: white;
+        }
+        
+        .close-btn:hover {
+            background: #444;
+        }
+        
+        .success-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #10ac84;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .success-message.show {
+            display: block;
+            animation: fadeInOut 3s ease-in-out;
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            10%, 90% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
     </style>
 </head>
@@ -411,11 +524,8 @@
             <div class="nav-buttons">
                 <button class="back-btn" onclick="goBack()">← Back</button>
                 <button class="edit-btn" onclick="editMode()">✏️ Edit</button>
-                <button class="whatsapp-btn" onclick="shareToWhatsApp()">
+                <button class="whatsapp-btn" onclick="showShareModal()">
                     <span>📱</span> Share to WhatsApp
-                </button>
-                <button class="whatsapp-btn" onclick="shareGeneric()" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-                    <span>📤</span> Share List
                 </button>
             </div>
             <div id="summaryContent"></div>
@@ -427,6 +537,28 @@
             <h2 style="margin-bottom: 20px; color: #2d3748;">Previous Lists</h2>
             <div id="historyContent"></div>
         </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div id="shareModal" class="share-modal">
+        <div class="share-modal-content">
+            <h3 style="margin-bottom: 15px; color: #333;">📱 Share Your Snacks List</h3>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Copy the text below and paste it in WhatsApp:</p>
+            <textarea id="shareText" class="share-text" readonly></textarea>
+            <div class="share-buttons">
+                <button class="modal-btn copy-btn" onclick="copyShareText()">📋 Copy Text</button>
+                <a id="whatsappWebLink" class="modal-btn whatsapp-web-btn" href="#" target="_blank">💬 Open WhatsApp Web</a>
+                <button class="modal-btn close-btn" onclick="closeShareModal()">✕ Close</button>
+            </div>
+            <p style="margin-top: 15px; color: #999; font-size: 12px;">
+                💡 Tip: After copying, open WhatsApp and paste the message to any chat
+            </p>
+        </div>
+    </div>
+    
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">
+        ✅ Copied to clipboard!
     </div>
 
     <script>
@@ -581,93 +713,7 @@
             showPage('summaryPage');
         }
         
-      function shareToWhatsApp() {
-    const filteredSnacks = snacksData.filter(snack => snack.quantity > 0);
-    if (filteredSnacks.length === 0) {
-        alert('No snacks selected to share!');
-        return;
-    }
-
-    const totalItems = filteredSnacks.reduce((sum, snack) => sum + snack.quantity, 0);
-
-    let message = "🍽️ *WBC Snacks List*\n\n";
-    message += "📋 *Items Ordered:*\n";
-    filteredSnacks.forEach(snack => {
-        message += `• ${snack.name}: ${snack.quantity}\n`;
-    });
-
-    const now = new Date();
-    message += `\n📊 *Total Items:* ${totalItems} snacks\n`;
-    message += `📅 *Date:* ${now.toLocaleDateString()}\n`;
-    message += `⏰ *Time:* ${now.toLocaleTimeString()}\n\n`;
-    message += "Generated by WBC Snacks App 📱";
-
-    const encodedMessage = encodeURIComponent(message);
-    const waUrl = `https://wa.me/?text=${encodedMessage}`;
-
-    // Detect if on mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    if (isMobile) {
-        // Open WhatsApp in same tab for better app opening support
-        //window.location.href = waUrl;
-        window.open(waUrl, '_system');
-
-        // Optional fallback
-        setTimeout(() => {
-            if (!document.hidden && confirm('WhatsApp didn’t open. Would you like to copy the text instead?')) {
-                navigator.clipboard.writeText(message)
-                    .then(() => alert("Message copied to clipboard!"))
-                    .catch(() => alert("Failed to copy. Please copy manually."));
-            }
-        }, 2500);
-    } else {
-        // Desktop browser fallback
-        window.open(`https://web.whatsapp.com/send?text=${encodedMessage}`, '_blank', 'noopener,noreferrer');
-    }
-}
-
-        
-        function tryWhatsAppUrl(urls, index) {
-            if (index >= urls.length) {
-                // If all URLs fail, show fallback
-                fallbackShare(message);
-                return;
-            }
-            
-            const url = urls[index];
-            
-            // Create a test link
-            const testLink = document.createElement('a');
-            testLink.href = url;
-            testLink.target = '_blank';
-            testLink.style.display = 'none';
-            document.body.appendChild(testLink);
-            
-            // Try to open the link
-            try {
-                testLink.click();
-                
-                // Check if it worked after a short delay
-                setTimeout(() => {
-                    // If we're still here and no WhatsApp opened, try next URL
-                    if (index < urls.length - 1) {
-                        tryWhatsAppUrl(urls, index + 1);
-                    } else {
-                        // Last resort: copy to clipboard
-                        fallbackShare(message);
-                    }
-                }, 1000);
-                
-            } catch (error) {
-                // If error occurs, try next URL
-                tryWhatsAppUrl(urls, index + 1);
-            } finally {
-                document.body.removeChild(testLink);
-            }
-        }
-        
-        function shareGeneric() {
+        function showShareModal() {
             const filteredSnacks = snacksData.filter(snack => snack.quantity > 0);
             if (filteredSnacks.length === 0) {
                 alert('No snacks selected to share!');
@@ -688,65 +734,54 @@
             message += `⏰ Time: ${new Date().toLocaleTimeString()}\n\n`;
             message += "Generated by WBC Snacks App 📱";
             
-            // Check if Web Share API is supported
-            if (navigator.share) {
-                navigator.share({
-                    title: 'WBC Snacks List',
-                    text: message,
-                }).catch(err => {
-                    console.log('Error sharing:', err);
-                    fallbackShare(message);
-                });
-            } else {
-                fallbackShare(message);
+            // Set the text in the modal
+            document.getElementById('shareText').value = message;
+            
+            // Create WhatsApp Web link
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappWebLink = `https://web.whatsapp.com/send?text=${encodedMessage}`;
+            document.getElementById('whatsappWebLink').href = whatsappWebLink;
+            
+            // Show modal
+            document.getElementById('shareModal').classList.add('active');
+        }
+        
+        function copyShareText() {
+            const shareText = document.getElementById('shareText');
+            shareText.select();
+            shareText.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showSuccessMessage();
+                } else {
+                    throw new Error('Copy command failed');
+                }
+            } catch (err) {
+                // Fallback for newer browsers
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareText.value).then(() => {
+                        showSuccessMessage();
+                    }).catch(() => {
+                        alert('Unable to copy to clipboard. Please select the text and copy manually.');
+                    });
+                } else {
+                    alert('Unable to copy to clipboard. Please select the text and copy manually.');
+                }
             }
         }
         
-        function fallbackShare(message) {
-            // Fallback: copy to clipboard
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(message).then(() => {
-                    alert('✅ List copied to clipboard!\n\nYou can now paste it in WhatsApp or any other app.');
-                }).catch(() => {
-                    showTextModal(message);
-                });
-            } else {
-                showTextModal(message);
-            }
-        }
-        
-        function showTextModal(message) {
-            const modal = document.createElement('div');
-            modal.innerHTML = `
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <div style="background: white; padding: 20px; border-radius: 15px; max-width: 90%; max-height: 80%; overflow: auto;">
-                        <h3 style="margin-bottom: 15px; color: #333;">📋 Copy and Share</h3>
-                        <p style="margin-bottom: 15px; color: #666; font-size: 14px;">Copy this text and paste it in WhatsApp or any messaging app:</p>
-                        <textarea readonly style="width: 100%; height: 200px; border: 1px solid #ddd; padding: 10px; border-radius: 8px; resize: none; font-family: monospace; font-size: 12px;">${message}</textarea>
-                        <div style="margin-top: 15px; display: flex; gap: 10px;">
-                            <button onclick="copyFromModal(this)" style="flex: 1; background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">📋 Copy Text</button>
-                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #666; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">✕ Close</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function copyFromModal(button) {
-            const textarea = button.parentElement.parentElement.querySelector('textarea');
-            textarea.select();
-            document.execCommand('copy');
-            
-            // Show feedback
-            const originalText = button.textContent;
-            button.textContent = '✅ Copied!';
-            button.style.background = '#10ac84';
-            
+        function showSuccessMessage() {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.classList.add('show');
             setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '#25d366';
-            }, 2000);
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+        
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
         }
         
         function showHistory() {
