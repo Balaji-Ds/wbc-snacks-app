@@ -609,7 +609,8 @@
             
             if (isMobile) {
                 // For mobile devices, try WhatsApp API first
-                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+                //const whatsappUrl = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+                const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
                 
                 // Create a temporary link and click it
                 const link = document.createElement('a');
