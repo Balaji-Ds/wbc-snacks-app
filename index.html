@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBC Snacks List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #2E86AB 0%, #A23B72 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app-container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #ffffff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2E86AB, #A23B72);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #2E86AB;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+        
+        .page {
+            display: none;
+            padding: 20px;
+            min-height: calc(100vh - 120px);
+        }
+        
+        .page.active {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .snack-item {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .snack-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+        
+        .snack-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .snack-name {
+            flex: 1;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+            min-width: 0;
+            word-break: break-word;
+        }
+        
+        .input-group {
+            flex: 0 0 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group input {
+            padding: 10px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            width: 100%;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .delete-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .add-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(79, 172, 254, 0.6);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #10ac84, #1dd1a1);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 172, 132, 0.4);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #a55eea, #26de81);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(165, 94, 234, 0.4);
+        }
+        
+        .edit-btn {
+            background: linear-gradient(135deg, #ffa726, #ff9800);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+        }
+        
+        .summary-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
+        }
+        
+        .summary-item h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .summary-item p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .total-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .total-summary h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .total-summary p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .snack-emoji {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo">WBC</div>
+                <div>
+                    <h1>WBC Snacks List</h1>
+                    <p>Consult • Develop • Integrate</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Page -->
+        <div id="mainPage" class="page active">
+            <div id="snacksList"></div>
+            <div class="button-container">
+                <button class="add-btn" onclick="addNewSnack()">+ Add New Snack</button>
+                <button class="submit-btn" onclick="showSummary()">✅ Done</button>
+            </div>
+        </div>
+        
+        <!-- Summary Page -->
+        <div id="summaryPage" class="page">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <button class="edit-btn" onclick="editMode()">✏️ Edit</button>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const defaultSnacks = [
+            { name: 'Vadai' },
+            { name: 'Samosa' },
+            { name: 'Paniyaram' },
+            { name: 'Boli' },
+            { name: 'Kolukattai' },
+            { name: 'Avichai kallai' },
+            { name: 'Pattani' }
+        ];
+        
+        let snacksData = [];
+        let isEditMode = false;
+        
+        function initializeApp() {
+            snacksData = defaultSnacks.map(snack => ({
+                ...snack,
+                quantity: 0
+            }));
+            renderSnacks();
+        }
+        
+        function updateSnackName(index, value) {
+            snacksData[index].name = value;
+            snacksData[index].isNew = false;
+        }
+        
+        function renderSnacks() {
+            const container = document.getElementById('snacksList');
+            container.innerHTML = '';
+            
+            snacksData.forEach((snack, index) => {
+                const snackItem = document.createElement('div');
+                snackItem.className = 'snack-item';
+                
+                if (snack.isNew) {
+                    snackItem.innerHTML = `
+                        <div class="snack-row">
+                            <div class="input-group" style="flex: 1;">
+                                <input type="text" 
+                                       placeholder="Snack name"
+                                       onchange="updateSnackName(${index}, this.value)">
+                            </div>
+                            <div class="input-group">
+                                <input type="number" 
+                                       value="${snack.quantity || ''}" 
+                                       placeholder="Qty"
+                                       onchange="updateQuantity(${index}, this.value)"
+                                       min="0">
+                            </div>
+                            <button class="delete-btn" onclick="deleteSnack(${index})">🗑️</button>
+                        </div>
+                    `;
+                } else {
+                    snackItem.innerHTML = `
+                        <div class="snack-row">
+                            <div class="snack-name">${snack.name}</div>
+                            <div class="input-group">
+                                <input type="number" 
+                                       value="${snack.quantity || ''}" 
+                                       placeholder="Qty"
+                                       onchange="updateQuantity(${index}, this.value)"
+                                       min="0">
+                            </div>
+                            <button class="delete-btn" onclick="deleteSnack(${index})">🗑️</button>
+                        </div>
+                    `;
+                }
+                container.appendChild(snackItem);
+            });
+        }
+        
+        function updateQuantity(index, value) {
+            snacksData[index].quantity = parseInt(value) || 0;
+        }
+        
+        function deleteSnack(index) {
+            snacksData.splice(index, 1);
+            renderSnacks();
+        }
+        
+        function addNewSnack() {
+            snacksData.push({
+                name: '',
+                emoji: '',
+                quantity: 0,
+                isNew: true
+            });
+            renderSnacks();
+        }
+        
+        function showSummary() {
+            const filteredSnacks = snacksData.filter(snack => snack.quantity > 0);
+            const summaryContent = document.getElementById('summaryContent');
+            
+            if (filteredSnacks.length === 0) {
+                summaryContent.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No snacks selected</h3>
+                        <p>Please add quantities to view summary</p>
+                    </div>
+                `;
+            } else {
+                const totalItems = filteredSnacks.reduce((sum, snack) => sum + snack.quantity, 0);
+                
+                summaryContent.innerHTML = `
+                    ${filteredSnacks.map(snack => `
+                        <div class="summary-item">
+                            <h3>${snack.name}</h3>
+                            <p>Quantity: ${snack.quantity}</p>
+                        </div>
+                    `).join('')}
+                    <div class="total-summary">
+                        <h2>Total Items</h2>
+                        <p>${totalItems} snacks</p>
+                    </div>
+                `;
+            }
+            
+            showPage('summaryPage');
+        }
+        
+        function editMode() {
+            showPage('mainPage');
+        }
+        
+        function goBack() {
+            showPage('mainPage');
+        }
+        
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // Initialize app on load
+        initializeApp();
+    </script>
+</body>
+</html>
