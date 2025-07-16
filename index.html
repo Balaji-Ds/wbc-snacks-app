@@ -610,7 +610,8 @@
 
     if (isMobile) {
         // Open WhatsApp in same tab for better app opening support
-        window.location.href = waUrl;
+        //window.location.href = waUrl;
+        window.open(waUrl, '_system');
 
         // Optional fallback
         setTimeout(() => {
