@@ -1,0 +1,134 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Focus rings */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem rgba(255, 255, 255, 0.6), 0 0 0 0.25rem #6ea8fe;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Sleek gradient background */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 800px at 10% 10%, rgba(99, 102, 241, 0.25), transparent 40%),
+              radial-gradient(1000px 700px at 90% 20%, rgba(236, 72, 153, 0.25), transparent 45%),
+              linear-gradient(135deg, #0f172a, #111827 60%, #0b1020);
+  color: #e5e7eb;
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.login-wrapper {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 120px);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  box-shadow: 0 6px 16px rgba(99,102,241,0.4);
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.muted {
+  color: #9ca3af;
+}
+
+label.form-label {
+  color: #cbd5e1;
+}
+
+.form-control,
+.form-control:focus {
+  background-color: rgba(17, 24, 39, 0.6);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #e5e7eb;
+}
+
+.form-control::placeholder {
+  color: #94a3b8;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  transition: transform 0.08s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 20px rgba(99,102,241,0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(99,102,241,0.45);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.link-muted a {
+  color: #a5b4fc;
+  text-decoration: none;
+}
+
+.link-muted a:hover {
+  color: #c7d2fe;
+}
+
+/* Layout adjustments */
+.navbar, .footer {
+  background: transparent !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+.navbar .nav-link, .navbar-brand, .footer, .footer a {
+  color: #e5e7eb !important;
+}
+
+main {
+  background: transparent;
+}

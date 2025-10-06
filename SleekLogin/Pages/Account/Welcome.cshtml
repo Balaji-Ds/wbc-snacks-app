@@ -1,0 +1,17 @@
+@page
+@model SleekLogin.Pages.Account.WelcomeModel
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="login-wrapper">
+    <div class="glass-panel login-card text-center">
+        <div class="brand">
+            <div class="brand-logo"></div>
+            <div class="brand-title">SleekLogin</div>
+        </div>
+        <h2 class="mb-2">Welcome</h2>
+        <p class="muted">You're signed in as @Model.EmailDisplayed</p>
+        <a class="btn btn-primary w-100 mt-3" asp-page="/Account/Login">Sign out</a>
+    </div>
+</div>
